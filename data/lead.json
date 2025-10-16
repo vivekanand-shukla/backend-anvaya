@@ -1,0 +1,94 @@
+[
+  {
+    "name": "TechNova Solutions",
+    "source": "Website",
+    "salesAgent": "64c34512f7a60e36df44",
+    "status": "Contacted",
+    "tags": ["New Client", "Potential Upgrade"],
+    "timeToClose": 15,
+    "priority": "Medium"
+  },
+  {
+    "name": "BrightEdge Marketing",
+    "source": "Cold Call",
+    "salesAgent": "64c34512f7a60e36df44",
+    "status": "Qualified",
+    "tags": ["High Value", "Negotiation Stage"],
+    "timeToClose": 20,
+    "priority": "High"
+  },
+  {
+    "name": "Urban Realty",
+    "source": "Advertisement",
+    "salesAgent": "64c34512f7a60e36df44",
+    "status": "Proposal Sent",
+    "tags": ["Follow-up", "Real Estate"],
+    "timeToClose": 25,
+    "priority": "Medium"
+  },
+  {
+    "name": "Global Freight Ltd.",
+    "source": "Email",
+    "salesAgent": "64c34512f7a60e36df44",
+    "status": "Closed",
+    "tags": ["Repeat Client"],
+    "timeToClose": 10,
+    "priority": "High",
+    "closedAt": "2025-09-25T00:00:00Z"
+  },
+  {
+    "name": "PixelCraft Studios",
+    "source": "Website",
+    "salesAgent": "64c34512f7a60e36df44",
+    "status": "New",
+    "tags": ["Creative Industry", "Long Term Prospect"],
+    "timeToClose": 40,
+    "priority": "Low"
+  },
+  {
+    "name": "NovaHealth Pvt Ltd",
+    "source": "Referral",
+    "salesAgent": "64c34512f7a60e36df44",
+    "status": "Contacted",
+    "tags": ["Healthcare", "High Value"],
+    "timeToClose": 18,
+    "priority": "High"
+  },
+  {
+    "name": "BlueSky Consulting",
+    "source": "Advertisement",
+    "salesAgent": "64c34512f7a60e36df44",
+    "status": "Qualified",
+    "tags": ["Corporate", "Follow-up"],
+    "timeToClose": 28,
+    "priority": "Medium"
+  },
+  {
+    "name": "EcoLife Organics",
+    "source": "Cold Call",
+    "salesAgent": "64c34512f7a60e36df44",
+    "status": "Proposal Sent",
+    "tags": ["Eco Product", "High Value"],
+    "timeToClose": 22,
+    "priority": "High"
+  },
+  {
+    "name": "BrightPath Education",
+    "source": "Email",
+    "salesAgent": "64c34512f7a60e36df44",
+    "status": "New",
+    "tags": ["Education Sector", "Potential Long-Term"],
+    "timeToClose": 35,
+    "priority": "Low"
+  },
+  {
+    "name": "NextGen Automobiles",
+    "source": "Other",
+    "salesAgent": "64c34512f7a60e36df44",
+    "status": "Closed",
+    "tags": ["High Value", "Repeat Client"],
+    "timeToClose": 12,
+    "priority": "High",
+    "closedAt": "2025-10-05T00:00:00Z"
+  }
+]
