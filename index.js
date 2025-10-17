@@ -1,6 +1,6 @@
-const { connectDB } = require("./connect/db.connect");
-connectDB();
-
+const { initializeDatabase } = require("./connect/db.connect");
+initializeDatabase();
+// MONGODB = mongodb+srv://VIVEK:vivek@cluster0.culs8.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
 const Agent = require("./models/agent.models");
 const Lead = require("./models/lead.models");
 const Comment = require("./models/comment.models");
@@ -391,7 +391,200 @@ app.get("/agents", async (req, res) => {
       name: agent.name,
       email: agent.email,
     }));
-    res.status(200).json(formattedAgents);
+    if(formattedAgents.length >0){
+
+      res.status(200).json(formattedAgents);
+    }else{
+       res.status(404).json({error:"no agent found"});
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+
+
+
+// COMMENTS ROUTES
+
+
+// Add a comment to a lead
+app.post("/leads/:id/comments", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { commentText, author } = req.body;
+
+    // Validate input
+    if (!commentText) {
+      return res.status(400).json({
+        error: "Invalid input: 'commentText' is required.",
+      });
+    }
+
+    // Check if lead exists
+    const lead = await Lead.findById(id);
+    if (!lead) {
+      return res.status(404).json({
+        error: `Lead with ID '${id}' not found.`,
+      });
+    }
+
+    // Check if author exists (if provided)
+    if (author) {
+      const agentExists = await Agent.findById(author);
+      if (!agentExists) {
+        return res.status(404).json({
+          error: `Author with ID '${author}' not found.`,
+        });
+      }
+    }
+
+    const comment = new Comment({
+      lead: id,
+      author: author,
+      commentText,
+    });
+
+    await comment.save();
+
+    // Populate author data
+    const populatedComment = await Comment.findById(comment._id).populate("author", "name");
+
+    res.status(201).json({
+      id: populatedComment._id,
+      commentText: populatedComment.commentText,
+      author: populatedComment.author ? populatedComment.author.name : "Unknown",
+      createdAt: populatedComment.createdAt,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get all comments for a lead
+app.get("/leads/:id/comments", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Check if lead exists
+    const lead = await Lead.findById(id);
+    if (!lead) {
+      return res.status(404).json({
+        error: `Lead with ID '${id}' not found.`,
+      });
+    }
+
+    const comments = await Comment.find({ lead: id }).populate("author", "name");
+
+    const formattedComments = comments.map((comment) => ({
+      id: comment._id,
+      commentText: comment.commentText,
+      author: comment.author ? comment.author.name : "Unknown",
+      createdAt: comment.createdAt,
+    }));
+
+    res.status(200).json(formattedComments);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+
+
+
+
+
+
+
+// TAGS ROUTES
+
+
+// Create a new tag
+app.post("/tags", async (req, res) => {
+  try {
+    const { name } = req.body;
+
+    if (!name) {
+      return res.status(400).json({
+        error: "Invalid input: 'name' is required.",
+      });
+    }
+
+    // Check if tag already exists
+    const existingTag = await Tag.findOne({ name });
+    if (existingTag) {
+      return res.status(409).json({
+        error: `Tag with name '${name}' already exists.`,
+      });
+    }
+
+    const tag = new Tag({ name });
+    await tag.save();
+
+    res.status(201).json({
+      id: tag._id,
+      name: tag.name,
+      createdAt: tag.createdAt,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get all tags
+app.get("/tags", async (req, res) => {
+  try {
+    const tags = await Tag.find();
+    const formattedTags = tags.map((tag) => ({
+      id: tag._id,
+      name: tag.name,
+    }));
+    res.status(200).json(formattedTags);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+// REPORTING ROUTES
+
+
+// Get leads closed last week
+app.get("/report/last-week", async (req, res) => {
+  try {
+    const lastWeek = new Date();
+    lastWeek.setDate(lastWeek.getDate() - 7);
+
+    const closedLeads = await Lead.find({
+      status: "Closed",
+      closedAt: { $gte: lastWeek },
+    }).populate("salesAgent", "name");
+
+    const formattedLeads = closedLeads.map((lead) => ({
+      id: lead._id,
+      name: lead.name,
+      salesAgent: lead.salesAgent ? lead.salesAgent.name : "Unknown",
+      closedAt: lead.closedAt,
+    }));
+
+    res.status(200).json(formattedLeads);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get total leads in pipeline
+app.get("/report/pipeline", async (req, res) => {
+  try {
+    const totalLeadsInPipeline = await Lead.countDocuments({
+      status: { $ne: "Closed" },
+    });
+
+    res.status(200).json({
+      totalLeadsInPipeline,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
