@@ -595,6 +595,89 @@ app.get("/report/pipeline", async (req, res) => {
 
 
 
+// UPDATE a comment
+
+app.put("/leads/:leadId/comments/:commentId", async (req, res) => {
+  try {
+    const { leadId, commentId } = req.params;
+    const { commentText } = req.body;
+
+    // Validate input
+    if (!commentText || !commentText.trim()) {
+      return res.status(400).json({
+        error: "Invalid input: 'commentText' is required.",
+      });
+    }
+
+    // Check if lead exists
+    const leadExists = await Lead.findById(leadId);
+    if (!leadExists) {
+      return res.status(404).json({
+        error: `Lead with ID '${leadId}' not found.`,
+      });
+    }
+
+    // Check if comment exists
+    const comment = await Comment.findOne({ _id: commentId, lead: leadId });
+    if (!comment) {
+      return res.status(404).json({
+        error: `Comment with ID '${commentId}' not found for this lead.`,
+      });
+    }
+
+    // Update comment text
+    comment.commentText = commentText;
+    await comment.save();
+
+    // Populate author
+    const updatedComment = await Comment.findById(commentId).populate("author", "name");
+
+    res.status(200).json({
+      id: updatedComment._id,
+      commentText: updatedComment.commentText,
+      author: updatedComment.author ? updatedComment.author.name : "Unknown",
+      createdAt: updatedComment.createdAt,
+      updatedAt: updatedComment?.updatedAt,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+// ===============================
+// DELETE a comment
+// ===============================
+app.delete("/leads/:leadId/comments/:commentId", async (req, res) => {
+  try {
+    const { leadId, commentId } = req.params;
+
+    // Check if lead exists
+    const leadExists = await Lead.findById(leadId);
+    if (!leadExists) {
+      return res.status(404).json({
+        error: `Lead with ID '${leadId}' not found.`,
+      });
+    }
+
+    // Check if comment exists and delete
+    const comment = await Comment.findOneAndDelete({ _id: commentId, lead: leadId });
+    if (!comment) {
+      return res.status(404).json({
+        error: `Comment with ID '${commentId}' not found for this lead.`,
+      });
+    }
+
+    res.status(200).json({
+      message: "Comment deleted successfully.",
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+
 
 app.listen(PORT, () => {
   console.log(`Server connected successfully on port http://localhost:${PORT}/`);
